@@ -2071,7 +2071,7 @@
         inputStream: {
           name: "Live",
           type: "LiveStream",
-          target: document.getElementById('video-preview'),
+          target: document.getElementById('scanner-overlay'),
           constraints: {
             facingMode: "environment" // caméra arrière
           }
@@ -2090,7 +2090,7 @@
           return;
         }
         Quagga.start();
-		overlay.classList.add('hidden');
+		//overlay.classList.add('hidden');
         //document.getElementById('status').innerText = "Scanner en cours...";
       });
 	  
