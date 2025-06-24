@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Scanner Code-Barres</title>
+  <script src="https://unpkg.com/@ericblade/quagga2@1.2.6/dist/quagga.min.js"></script>
+</head>
+<body>
+  <h2>Scanner un produit</h2>
+  <div id="camera" style="width: 100%; max-width: 400px;"></div>
+  <p id="status">Initialisation...</p>
+  <div id="product-details"></div>
+
+  <script>
+    function startScanner() {
+      Quagga.init({
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: document.querySelector('#camera'),
+          constraints: {
+            facingMode: "environment" // caméra arrière
+          }
+        },
+        decoder: {
+          readers: ["ean_reader"] // pour codes EAN-13
+        }
+      }, function(err) {
+        if (err) {
+          document.getElementById('status').innerText = "Erreur caméra : " + err;
+          return;
+        }
+        Quagga.start();
+        document.getElementById('status').innerText = "Scanner en cours...";
+      });
+
+      Quagga.onDetected(async function(result) {
+        const code = result.codeResult.code;
+        document.getElementById('status').innerText = `Code détecté : ${code}`;
+        Quagga.stop(); // Stop scan après détection
+
+        try {
+          const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
+          const data = await response.json();
+
+          if (data.status === 1) {
+            const product = data.product;
+            document.getElementById('product-details').innerHTML = `
+              <h3>${product.product_name}</h3>
+              <p><strong>Marque:</strong> ${product.brands}</p>
+              <p><strong>Quantité:</strong> ${product.quantity}</p>
+              <p><strong>Catégorie:</strong> ${product.categories}</p>
+              <img src="${product.image_front_url}" width="100">
+            `;
+          } else {
+            document.getElementById('product-details').innerText = "Produit non trouvé.";
+          }
+        } catch (err) {
+          document.getElementById('product-details').innerText = "Erreur lors de la récupération du produit.";
+        }
+      });
+    }
+
+    // Lancer le scanner à l’ouverture
+    window.onload = startScanner;
+  </script>
+</body>
+</html>
