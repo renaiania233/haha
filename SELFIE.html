@@ -2041,9 +2041,13 @@
         }
         
         function switchVenteCamera() {
+			alert(cameras.length);
+			console.log(cameras)
+			alert(currentCameraIndex)
             if (cameras.length < 2) return;
             
             currentCameraIndex = (currentCameraIndex + 1) % cameras.length;
+			alert(currentCameraIndex)
             const newCameraId = cameras[currentCameraIndex].deviceId;
             
             stopScanner();
