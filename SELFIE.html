@@ -1021,12 +1021,7 @@
                 <h2><i class="fas fa-camera"></i> Scanner Code-barres</h2>
                 <div class="scanner-container">
 			
-                    <div class="scanner-overlay" id="scanner-overlay">
-                        <div>
-                            
-                            <p id="camera-error" class="hidden" style="color: #ff6b6b; margin-top: 10px;"></p>
-                        </div>
-                    </div>
+
                     <video id="video-preview" autoplay playsinline muted></video>
 
                
@@ -2055,8 +2050,8 @@
             
             const videoElem = document.getElementById('video-preview');
             const resultDiv = document.getElementById('modal-scan-result');
-            const overlay = document.getElementById('scanner-overlay');
-            const errorMsg = document.getElementById('camera-error');
+            //const overlay = document.getElementById('scanner-overlay');
+            //const errorMsg = document.getElementById('camera-error');
             
             resultDiv.innerHTML = '<i class="fas fa-info-circle"></i> En attente de scan...';
             overlay.classList.remove('hidden');
@@ -2066,7 +2061,7 @@
         inputStream: {
           name: "Live",
           type: "LiveStream",
-          target: document.getElementsByClassName("scanner-overlay")[1],
+          target: document.getElementById('video-preview'),
           constraints: {
             facingMode: "environment" // caméra arrière
           }
