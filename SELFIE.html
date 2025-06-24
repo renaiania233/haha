@@ -1029,10 +1029,7 @@
                     </div>
                     <video id="video-preview" autoplay playsinline muted></video>
 
-                    <div class="zoom-controls">
-                        <button class="zoom-btn" id="zoom-out">-</button>
-                        <button class="zoom-btn" id="zoom-in">+</button>
-                    </div>
+               
                 </div>
                 <div id="modal-scan-result" class="alert alert-info">
                     <i class="fas fa-info-circle"></i> En attente de scan...
@@ -2069,7 +2066,7 @@
         inputStream: {
           name: "Live",
           type: "LiveStream",
-          target: document.getElementsByClassName("scanner-overlay")[0],
+          target: document.getElementsByClassName("scanner-overlay")[1],
           constraints: {
             facingMode: "environment" // caméra arrière
           }
