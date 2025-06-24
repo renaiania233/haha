@@ -1020,21 +1020,14 @@
                 <button id="close-scanner-modal" class="close-modal"><i class="fas fa-times"></i></button>
                 <h2><i class="fas fa-camera"></i> Scanner Code-barres</h2>
                 <div class="scanner-container">
-                    <div class="scanner-overlay" id="scanner-overlay">
-                        <div>
+                    
                             <i class="fas fa-spinner fa-spin fa-2x"></i>
                             <p>Chargement de la caméra...</p>
                             <p id="camera-error" class="hidden" style="color: #ff6b6b; margin-top: 10px;"></p>
                         </div>
                     </div>
                     <video id="video-preview" autoplay playsinline muted></video>
-                    <div class="scanner-frame">
-                        <div class="scanner-animation"></div>
-                    </div>
-                    <div class="zoom-controls">
-                        <button class="zoom-btn" id="zoom-out">-</button>
-                        <button class="zoom-btn" id="zoom-in">+</button>
-                    </div>
+                    
                 </div>
                 <div id="modal-scan-result" class="alert alert-info">
                     <i class="fas fa-info-circle"></i> En attente de scan...
@@ -2071,7 +2064,7 @@
         inputStream: {
           name: "Live",
           type: "LiveStream",
-          target: document.getElementById('scanner-overlay'),
+          target: document.getElementById('video-preview'),
           constraints: {
             facingMode: "environment" // caméra arrière
           }
