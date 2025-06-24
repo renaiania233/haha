@@ -2061,96 +2061,50 @@
             overlay.classList.remove('hidden');
             errorMsg.classList.add('hidden');
             
-            currentZoom = 1;
-            videoElem.style.transform = 'scale(1)';
-            
-            // Obtenir la liste des caméras si nécessaire
-            if (cameras.length === 0) {
-                cameras = await getCameras();
-            }
-            
-           
-            const constraints = { 
-                video: { 
-                    deviceId: cameraId ? { exact: cameraId } : undefined,
-                    facingMode: cameraId ? undefined : 'environment',
-                    width: { min: 640, ideal: 1280 },
-                    height: { min: 480, ideal: 720 },
-                    focusMode: 'continuous'
-                } 
-            };
-            
-            // Réinitialiser le flux vidéo existant
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-            }
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                currentStream = stream;
-                videoElem.srcObject = stream;
-                
-
-                videoElem.onplaying = () => {
-                    overlay.classList.add('hidden');
-                    
-                    // Délai pour laisser la caméra s'ajuster
-                    setTimeout(() => {
-                        codeReader.decodeFromVideoElement(videoElem, (result, err) => {
-                            if (result) {
-                                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Code détecté: ${result.text}`;
-                                
-                                const produit = produits.find(p => p.code === result.text);
-                                if (produit) {
-                                    showProductInfo(produit);
-                                } else {
-                                    resultDiv.innerHTML += `<div style="margin-top:15px;color:red;font-size:1.2rem"><i class="fas fa-exclamation-triangle"></i> Produit non trouvé</div>`;
-                                }
-                                
-                                // Vibrer si possible
-                                if (navigator.vibrate) {
-                                    navigator.vibrate(200);
-                                }
-                                
-                                // Pause avant de redémarrer le scanner
-                                setTimeout(() => {
-                                    if (codeReader) {
-                                        codeReader.reset();
-                                    }
-                                    resultDiv.innerHTML = '<i class="fas fa-info-circle"></i> En attente de scan...';
-                                }, 1000);
-                            }
-                        }).catch(err => {
-                            console.error('Erreur de scan:', err);
+      Quagga.init({
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: document.querySelector('#camera'),
+          constraints: {
+            facingMode: "environment" // caméra arrière
+          }
+        },
+        decoder: {
+          readers: ["ean_reader"] // pour codes EAN-13
+        }
+      }, function(err) {
+        if (err) {
+          console.error('Erreur de scan:', err);
                             resultDiv.innerHTML = `<div style="color:red;font-size:1.2rem">
-                                <i class="fas fa-exclamation-triangle"></i> Erreur de scan: ${err.message || 'Problème avec le scanner'}
+                                <i class="fas fa-exclamation-triangle"></i> Erreur de scan: ${err || 'Problème avec le scanner'}
                                 <button id="retry-scanner" class="btn btn-primary" style="margin-top:10px">Réessayer</button>
                             </div>`;
                             document.getElementById('retry-scanner').addEventListener('click', restartScanner);
-                        });
-                    }, 1000);
-                };
-            } catch (err) {
-                console.error('Erreur de caméra:', err);
-                overlay.classList.remove('hidden');
-                errorMsg.classList.remove('hidden');
-                
-                // Message plus explicite
-                let errorText = 'Erreur: ';
-                if (err.name === 'NotAllowedError') {
-                    errorText += 'Permission caméra refusée. Autorisez l\'accès dans les paramètres du navigateur.';
-                } else if (err.name === 'NotFoundError') {
-                    errorText += 'Caméra non trouvée. Vérifiez votre appareil.';
-                } else if (err.name === 'OverconstrainedError') {
-                    errorText += 'Aucune caméra ne correspond aux contraintes demandées.';
-                } else {
-                    errorText += `${err.message || 'Problème technique'}`;
-                }
-                
-                errorMsg.textContent = errorText;
-            }
+          return;
         }
+        Quagga.start();
+		overlay.classList.add('hidden');
+        //document.getElementById('status').innerText = "Scanner en cours...";
+      });
+	  
+	    Quagga.onDetected(async function(result) {
+        const code = result.codeResult.code;
+        resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Code détecté: ${code}`;
+		const produit = produits.find(p => p.code === code);
+        if (produit) {
+            showProductInfo(produit);
+        } else {
+             resultDiv.innerHTML += `<div style="margin-top:15px;color:red;font-size:1.2rem"><i class="fas fa-exclamation-triangle"></i> Produit non trouvé</div>`;
+        }
+                                
         
+        if (navigator.vibrate) {
+            navigator.vibrate(200);
+                                }
+        Quagga.stop(); // Stop scan après détection
+
+
         async function openScannerModalForProduct() {
             openModal('scanner-modal');
             currentModal = 'scanner-modal';
