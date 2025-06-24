@@ -2053,7 +2053,10 @@
           type: "LiveStream",
           target: document.getElementById('hola'),
           constraints: {
-            facingMode: "environment" // caméra arrière
+            facingMode: "environment", // caméra arrière
+			 width: { ideal: 300 },   // ou exact: 640
+             height: { ideal: 200 }
+			
           }
         },
         decoder: {
